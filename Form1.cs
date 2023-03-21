@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Vishener;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Первая_пара_тимп
@@ -30,14 +32,14 @@ namespace Первая_пара_тимп
         {
             InitializeComponent();
         }
-
+        
         ///////////////////////////////////////////////////
 
         /// Шифровка
 
         ///////////////////////////////////////////////////
 
-        public bool string_in(char a, string s) // функция, которая проверяет наличие того или иного элемента в алфавите 
+        private bool string_in(char a, string s) // функция, которая проверяет наличие того или иного элемента в алфавите 
         {
             for (int i = 0; i < s.Length; i++)
                 if (a == s[i])
@@ -123,6 +125,9 @@ namespace Первая_пара_тимп
 
         private void button2_Click(object sender, EventArgs e)
         {
+
+            
+
             try
             {
                 ss = richTextBox6.Text.ToLower(); // получаем текст из окошка
@@ -195,6 +200,10 @@ namespace Первая_пара_тимп
                     if (hit_index > 0.054) // если индекс совпадений больше критического числа => мы нашли длину ключа 
                     {
                         size_key = p;
+                        key_class.len = p;
+                        key_class.index_of_repeat = hit_index;
+                        Form2 fr = new Form2();
+                        fr.Show();
                         break;
                     }
                 }
@@ -296,6 +305,51 @@ namespace Первая_пара_тимп
             }
             catch
             { MessageBox.Show("Неправильный ввод  текста"); }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            key = richTextBox9.Text;
+            Decryption_V(al, key);
+        }
+        private void Decryption_V(string alf, string key)
+        {
+            try
+            {
+                int n = alf.Length;
+                if (alf.Length == 0) throw new Exception("Алфавит не выбран");
+
+
+                //
+                s = richTextBox7.Text;
+                if (s.Length == 0) throw new Exception("Исходный текст пуст");
+                //
+                for (int i = 0; i < s.Length; i++)
+                    if (!string_in(s[i], alf)) throw new Exception("В тексте присутствует лишние символы ( другой язык, пробелы, знаки препинания, верхний регистр и т.д.)");
+                //
+                if (key.Length == 0) throw new Exception("Вы не ввели ключ");
+                for (int i = 0; i < key.Length; i++)
+                    if (!string_in(key[i], alf)) throw new Exception("В ключе присутствует лишние символы ( другой язык, пробелы, знаки препинания, верхний регистр и т.д.)");
+
+
+                //
+
+                for (int i = 0; i < s.Length; i++) // главный цикл, который проводит расшифрование
+                {
+
+                    S += alf[(alf.IndexOf(s[i]) - alf.IndexOf(key[i % key.Length]) + n) % n];
+                }
+
+                richTextBox8.Text = S;
+                S = "";
+                
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Ошибка : {e.Message}");
+
+            }
         }
     }
 }
